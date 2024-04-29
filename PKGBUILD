@@ -5,7 +5,7 @@
 # Contributor: Tom K <tomk@runbox.com>
 
 pkgname=hdf5
-pkgver=1.14.3
+pkgver=1.14.4.2
 pkgrel=1
 pkgdesc="General purpose library and file format for storing scientific data"
 arch=(x86_64)
@@ -15,11 +15,12 @@ depends=(zlib libaec bash)
 makedepends=(cmake time gcc-fortran java-environment)
 replaces=(hdf5-java)
 provides=(hdf5-java)
-source=(https://support.hdfgroup.org/ftp/HDF5/releases/${pkgname}-${pkgver:0:4}/${pkgname}-${pkgver/_/-}/src/${pkgname}-${pkgver/_/-}.tar.bz2)
-sha256sums=('9425f224ed75d1280bb46d6f26923dd938f9040e7eaebf57e66ec7357c08f917')
+#source=(https://support.hdfgroup.org/ftp/HDF5/releases/${pkgname}-${pkgver:0:4}/${pkgname}-${pkgver/_/-}/src/${pkgname}-${pkgver/_/-}.tar.bz2)
+source=(https://github.com/HDFGroup/hdf5/archive/hdf5_$pkgver/$pkgname-$pkgver.tar.gz)
+sha256sums=('44c47120e8beeb69f83b2de10203dceb6ef63f253b7859063a60205c8f48ab80')
 
 prepare() {
-    cd ${pkgname}-${pkgver/_/-}
+    cd ${pkgname}-${pkgname}_${pkgver/_/-}
     # Don't mess with build flags
     sed -e '/-Werror/d' -i configure
 }
@@ -28,7 +29,7 @@ build() {
     # Crazy workaround: run CMake to generate pkg-config file
     #cmake -B build -S ${pkgname}-${pkgver/_/-} \
     mkdir -p build && cd build
-    cmake ../${pkgname}-${pkgver/_/-} \
+    cmake ../${pkgname}-${pkgname}_${pkgver/_/-} \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DBUILD_STATIC_LIBS=OFF \
         -DCMAKE_BUILD_TYPE=Release \
@@ -41,7 +42,7 @@ build() {
         -DHDF5_ENABLE_SZIP_ENCODING=ON \
         -DUSE_LIBAEC=ON
     # But don’t build with it, it’s quite broken
-    cd ../${pkgname}-${pkgver/_/-}
+    cd ../${pkgname}-${pkgname}_${pkgver/_/-}
     ./configure \
         --prefix=/usr \
         --docdir=/usr/share/doc/hdf5/ \
@@ -60,7 +61,7 @@ build() {
 }
 
 check() {
-    cd ${pkgname}-${pkgver/_/-}
+    cd ${pkgname}-${pkgname}_${pkgver/_/-}
     # Without this, checks are failing with messages like “error while loading shared libraries: libhdf5.so.101: cannot open shared object file: No such file or directory”
     export LD_LIBRARY_PATH="${srcdir}"/${pkgname}-${pkgver/_/-}/src/.libs/
     export LD_LIBRARY_PATH="$LD_LIBRARY_PATH":"${srcdir}"/${pkgname}-${pkgver/_/-}/c++/src/.libs/
@@ -72,7 +73,7 @@ check() {
 }
 
 package() {
-    cd ${pkgname}-${pkgver/_/-}
+    cd ${pkgname}-${pkgname}_${pkgver/_/-}
     make DESTDIR="${pkgdir}" install
     install -Dm644 COPYING -t "${pkgdir}"/usr/share/licenses/${pkgname}
 
