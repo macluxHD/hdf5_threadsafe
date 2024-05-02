@@ -6,7 +6,7 @@
 
 pkgname=hdf5
 pkgver=1.14.4.2
-pkgrel=1
+pkgrel=2
 pkgdesc="General purpose library and file format for storing scientific data"
 arch=(x86_64)
 url="https://www.hdfgroup.org/hdf5"
@@ -16,13 +16,17 @@ makedepends=(cmake time gcc-fortran java-environment)
 replaces=(hdf5-java)
 provides=(hdf5-java)
 #source=(https://support.hdfgroup.org/ftp/HDF5/releases/${pkgname}-${pkgver:0:4}/${pkgname}-${pkgver/_/-}/src/${pkgname}-${pkgver/_/-}.tar.bz2)
-source=(https://github.com/HDFGroup/hdf5/archive/hdf5_$pkgver/$pkgname-$pkgver.tar.gz)
-sha256sums=('44c47120e8beeb69f83b2de10203dceb6ef63f253b7859063a60205c8f48ab80')
+source=(https://github.com/HDFGroup/hdf5/archive/hdf5_$pkgver/$pkgname-$pkgver.tar.gz
+        https://github.com/HDFGroup/hdf5/commit/8329ef34.patch)
+sha256sums=('44c47120e8beeb69f83b2de10203dceb6ef63f253b7859063a60205c8f48ab80'
+            '2cb9f19245acbaf61bb63e8f941d6c0a1fbd679c6925b9c49088e61b70ba6661')
 
 prepare() {
     cd ${pkgname}-${pkgname}_${pkgver/_/-}
     # Don't mess with build flags
     sed -e '/-Werror/d' -i configure
+    # Fix segfault in h5py tests
+    patch -p1 -i ../8329ef34.patch
 }
 
 build() {
@@ -56,7 +60,8 @@ build() {
         --enable-java \
         --with-pic \
         --with-zlib \
-        --with-szlib
+        --with-szlib \
+        --disable-nonstandard-feature-float16
     make
 }
 

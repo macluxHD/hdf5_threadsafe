@@ -1,7 +1,7 @@
 pkgbase = hdf5
 	pkgdesc = General purpose library and file format for storing scientific data
 	pkgver = 1.14.4.2
-	pkgrel = 1
+	pkgrel = 2
 	url = https://www.hdfgroup.org/hdf5
 	arch = x86_64
 	license = custom
@@ -15,6 +15,8 @@ pkgbase = hdf5
 	provides = hdf5-java
 	replaces = hdf5-java
 	source = https://github.com/HDFGroup/hdf5/archive/hdf5_1.14.4.2/hdf5-1.14.4.2.tar.gz
+	source = https://github.com/HDFGroup/hdf5/commit/8329ef34.patch
 	sha256sums = 44c47120e8beeb69f83b2de10203dceb6ef63f253b7859063a60205c8f48ab80
+	sha256sums = 2cb9f19245acbaf61bb63e8f941d6c0a1fbd679c6925b9c49088e61b70ba6661
 
 pkgname = hdf5
