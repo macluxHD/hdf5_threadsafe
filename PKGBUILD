@@ -6,7 +6,7 @@
 
 pkgname=hdf5
 pkgver=1.14.4.2
-pkgrel=2
+pkgrel=3
 pkgdesc="General purpose library and file format for storing scientific data"
 arch=(x86_64)
 url="https://www.hdfgroup.org/hdf5"
@@ -60,8 +60,7 @@ build() {
         --enable-java \
         --with-pic \
         --with-zlib \
-        --with-szlib \
-        --disable-nonstandard-feature-float16
+        --with-szlib
     make
 }
 
