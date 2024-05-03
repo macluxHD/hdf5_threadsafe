@@ -6,7 +6,7 @@
 
 pkgname=hdf5
 pkgver=1.14.4.2
-pkgrel=3
+pkgrel=4
 pkgdesc="General purpose library and file format for storing scientific data"
 arch=(x86_64)
 url="https://www.hdfgroup.org/hdf5"
@@ -17,9 +17,9 @@ replaces=(hdf5-java)
 provides=(hdf5-java)
 #source=(https://support.hdfgroup.org/ftp/HDF5/releases/${pkgname}-${pkgver:0:4}/${pkgname}-${pkgver/_/-}/src/${pkgname}-${pkgver/_/-}.tar.bz2)
 source=(https://github.com/HDFGroup/hdf5/archive/hdf5_$pkgver/$pkgname-$pkgver.tar.gz
-        https://github.com/HDFGroup/hdf5/commit/8329ef34.patch)
+        8329ef34.patch)
 sha256sums=('44c47120e8beeb69f83b2de10203dceb6ef63f253b7859063a60205c8f48ab80'
-            '2cb9f19245acbaf61bb63e8f941d6c0a1fbd679c6925b9c49088e61b70ba6661')
+            '0679f3e70b15a644dbb187d1a3375e55f73c9a90e84829d1c5bbab812ffd8376')
 
 prepare() {
     cd ${pkgname}-${pkgname}_${pkgver/_/-}
