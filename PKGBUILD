@@ -6,7 +6,7 @@
 
 pkgname=hdf5
 pkgver=1.14.4.2
-pkgrel=4
+pkgrel=5
 pkgdesc="General purpose library and file format for storing scientific data"
 arch=(x86_64)
 url="https://www.hdfgroup.org/hdf5"
@@ -17,16 +17,16 @@ replaces=(hdf5-java)
 provides=(hdf5-java)
 #source=(https://support.hdfgroup.org/ftp/HDF5/releases/${pkgname}-${pkgver:0:4}/${pkgname}-${pkgver/_/-}/src/${pkgname}-${pkgver/_/-}.tar.bz2)
 source=(https://github.com/HDFGroup/hdf5/archive/hdf5_$pkgver/$pkgname-$pkgver.tar.gz
-        8329ef34.patch)
+        hdf5-fix-crash-partially-initialized-datatypes.patch)
 sha256sums=('44c47120e8beeb69f83b2de10203dceb6ef63f253b7859063a60205c8f48ab80'
-            '0679f3e70b15a644dbb187d1a3375e55f73c9a90e84829d1c5bbab812ffd8376')
+            'e3b096ac3e401b7af900eb5eacbcd9b7b5d83619bc7e2fad9cf6fa8420acf7c9')
 
 prepare() {
     cd ${pkgname}-${pkgname}_${pkgver/_/-}
     # Don't mess with build flags
     sed -e '/-Werror/d' -i configure
     # Fix segfault in h5py tests
-    patch -p1 -i ../8329ef34.patch
+    patch -p1 -i ../hdf5-fix-crash-partially-initialized-datatypes.patch
 }
 
 build() {
