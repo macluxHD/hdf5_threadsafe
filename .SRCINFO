@@ -16,7 +16,9 @@ pkgbase = hdf5
 	replaces = hdf5-java
 	source = https://github.com/HDFGroup/hdf5/archive/hdf5_1.14.4.2/hdf5-1.14.4.2.tar.gz
 	source = hdf5-fix-crash-partially-initialized-datatypes.patch
+	source = https://github.com/HDFGroup/hdf5/commit/ea760136.patch
 	sha256sums = 44c47120e8beeb69f83b2de10203dceb6ef63f253b7859063a60205c8f48ab80
 	sha256sums = e3b096ac3e401b7af900eb5eacbcd9b7b5d83619bc7e2fad9cf6fa8420acf7c9
+	sha256sums = eac6786aa11e84090ce9b35d0eb3a8054d28d0d22debfe31c65845379325218d
 
 pkgname = hdf5

@@ -17,9 +17,11 @@ replaces=(hdf5-java)
 provides=(hdf5-java)
 #source=(https://support.hdfgroup.org/ftp/HDF5/releases/${pkgname}-${pkgver:0:4}/${pkgname}-${pkgver/_/-}/src/${pkgname}-${pkgver/_/-}.tar.bz2)
 source=(https://github.com/HDFGroup/hdf5/archive/hdf5_$pkgver/$pkgname-$pkgver.tar.gz
-        hdf5-fix-crash-partially-initialized-datatypes.patch)
+        hdf5-fix-crash-partially-initialized-datatypes.patch
+        https://github.com/HDFGroup/hdf5/commit/ea760136.patch)
 sha256sums=('44c47120e8beeb69f83b2de10203dceb6ef63f253b7859063a60205c8f48ab80'
-            'e3b096ac3e401b7af900eb5eacbcd9b7b5d83619bc7e2fad9cf6fa8420acf7c9')
+            'e3b096ac3e401b7af900eb5eacbcd9b7b5d83619bc7e2fad9cf6fa8420acf7c9'
+            'eac6786aa11e84090ce9b35d0eb3a8054d28d0d22debfe31c65845379325218d')
 
 prepare() {
     cd ${pkgname}-${pkgname}_${pkgver/_/-}
@@ -27,6 +29,8 @@ prepare() {
     sed -e '/-Werror/d' -i configure
     # Fix segfault in h5py tests
     patch -p1 -i ../hdf5-fix-crash-partially-initialized-datatypes.patch
+    # Fix operator=
+    patch -p1 -i ../ea760136.patch
 }
 
 build() {
