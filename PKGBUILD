@@ -12,8 +12,17 @@ pkgdesc="General purpose library and file format for storing scientific data"
 arch=(x86_64)
 url="https://www.hdfgroup.org/hdf5"
 license=(custom)
-depends=(zlib libaec bash)
-makedepends=(cmake time gcc-fortran java-environment)
+depends=(
+  bash
+  libaec
+  zlib
+)
+makedepends=(
+  cmake
+  gcc-fortran
+  java-environment
+  time
+)
 replaces=(hdf5-java)
 provides=(hdf5-java)
 #source=(https://support.hdfgroup.org/ftp/HDF5/releases/${pkgname}-${pkgver:0:4}/${pkgname}-${pkgver/_/-}/src/${pkgname}-${pkgver/_/-}.tar.bz2)
