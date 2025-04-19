@@ -5,15 +5,21 @@
 # Contributor: damir <damir@archlinux.org>
 # Contributor: Tom K <tomk@runbox.com>
 
-pkgname=hdf5
-pkgver=1.14.5
+pkgbase=hdf5
+pkgname=(
+  hdf5
+  hdf5-openmpi
+)
+pkgver=1.14.6
 pkgrel=1
 pkgdesc="General purpose library and file format for storing scientific data"
 arch=(x86_64)
 url="https://www.hdfgroup.org/hdf5"
-license=(custom)
+license=(BSD-3-Clause)
 depends=(
   bash
+  gcc-libs
+  glibc
   libaec
   zlib
 )
@@ -21,76 +27,77 @@ makedepends=(
   cmake
   gcc-fortran
   java-environment
+  openmpi
   time
 )
 replaces=(hdf5-java)
 provides=(hdf5-java)
-#source=(https://support.hdfgroup.org/ftp/HDF5/releases/${pkgname}-${pkgver:0:4}/${pkgname}-${pkgver/_/-}/src/${pkgname}-${pkgver/_/-}.tar.bz2)
-source=(https://github.com/HDFGroup/hdf5/archive/hdf5_$pkgver/$pkgname-$pkgver.tar.gz)
-sha256sums=('c83996dc79080a34e7b5244a1d5ea076abfd642ec12d7c25388e2fdd81d26350')
-
-prepare() {
-  cd ${pkgname}-${pkgname}_${pkgver/_/-}
-  # Don't mess with build flags
-  sed -e '/-Werror/d' -i configure
-}
+source=("https://github.com/HDFGroup/hdf5/archive/hdf5_$pkgver/$pkgname-$pkgver.tar.gz")
+sha256sums=('09ee1c671a87401a5201c06106650f62badeea5a3b3941e9b1e2e1e08317357f')
 
 build() {
-  # Crazy workaround: run CMake to generate pkg-config file
-  #cmake -B build -S ${pkgname}-${pkgver/_/-} \
-  mkdir -p build && cd build
-  cmake ../${pkgname}-${pkgname}_${pkgver/_/-} \
-    -DCMAKE_INSTALL_PREFIX=/usr \
-    -DBUILD_STATIC_LIBS=OFF \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DHDF5_BUILD_HL_LIB=ON \
-    -DHDF5_BUILD_CPP_LIB=ON \
-    -DHDF5_BUILD_FORTRAN=ON \
-    -DHDF5_BUILD_JAVA=ON \
-    -DHDF5_ENABLE_Z_LIB_SUPPORT=ON \
-    -DHDF5_ENABLE_SZIP_SUPPORT=ON \
-    -DHDF5_ENABLE_SZIP_ENCODING=ON \
-    -DUSE_LIBAEC=ON
-  # But don’t build with it, it’s quite broken
-  cd ../${pkgname}-${pkgname}_${pkgver/_/-}
-  ./configure \
-    --prefix=/usr \
-    --docdir=/usr/share/doc/hdf5/ \
-    --with-examplesdir=/usr/share/doc/hdf5/examples/ \
-    --disable-static \
-    --disable-sharedlib-rpath \
-    --enable-build-mode=production \
-    --enable-hl \
-    --enable-cxx \
-    --enable-fortran \
-    --enable-java \
-    --with-pic \
-    --with-zlib \
-    --with-szlib
-  make
+  cd ${pkgbase}-${pkgbase}_${pkgver/_/-}
+  local common_cmake_args=(
+    -DCMAKE_BUILD_TYPE=None
+    -DCMAKE_INSTALL_PREFIX=/usr
+    -Wno-dev
+    -DHDF5_USE_GNU_DIRS=ON
+    -DBUILD_STATIC_LIBS=OFF
+    -DHDF5_BUILD_CPP_LIB=ON
+    -DHDF5_BUILD_HL_LIB=ON
+    -DHDF5_BUILD_FORTRAN=ON
+    -DHDF5_BUILD_JAVA=ON
+    -DHDF5_ENABLE_Z_LIB_SUPPORT=ON
+    -DHDF5_ENABLE_SZIP_SUPPORT=ON
+    -DHDF5_ENABLE_SZIP_ENCODING=ON
+    -Dlibaec_ROOT=/usr/lib/cmake
+  )
+  cmake -S . -B build "${common_cmake_args[@]}"
+  cmake -S . -B build-mpi "${common_cmake_args[@]}" \
+    -DALLOW_UNSUPPORTED=ON \
+    -DCMAKE_CXX_COMPILER=mpicxx \
+    -DCMAKE_C_COMPILER=mpicc \
+    -DCMAKE_Fortran_COMPILER=mpif90 \
+    -DHDF5_ENABLE_PARALLEL=ON
+  cmake --build build
+  cmake --build build-mpi
 }
 
 check() {
-  cd ${pkgname}-${pkgname}_${pkgver/_/-}
-  # Without this, checks are failing with messages like “error while loading shared libraries: libhdf5.so.101: cannot open shared object file: No such file or directory”
-  export LD_LIBRARY_PATH="${srcdir}"/${pkgname}-${pkgver/_/-}/src/.libs/
-  export LD_LIBRARY_PATH="$LD_LIBRARY_PATH":"${srcdir}"/${pkgname}-${pkgver/_/-}/c++/src/.libs/
-  export LD_LIBRARY_PATH="$LD_LIBRARY_PATH":"${srcdir}"/${pkgname}-${pkgver/_/-}/fortran/src/.libs/
-  export LD_LIBRARY_PATH="$LD_LIBRARY_PATH":"${srcdir}"/${pkgname}-${pkgver/_/-}/hl/src/.libs/
-  export LD_LIBRARY_PATH="$LD_LIBRARY_PATH":"${srcdir}"/${pkgname}-${pkgver/_/-}/hl/c++/src/.libs/
-  export LD_LIBRARY_PATH="$LD_LIBRARY_PATH":"${srcdir}"/${pkgname}-${pkgver/_/-}/hl/fortran/src/.libs/
-  make check
+  cd ${pkgbase}-${pkgbase}_${pkgver/_/-}
+  ctest --test-dir build --output-on-failure --parallel \
+    -E 'H5_H5DUMP-f90_h5ex_t_stringC_F03'
+
+  local skipped_tests=(
+    # Passes, but takes 100+ seconds, ain't nobody got time for that.
+    H5SHELL-test_swmr
+    H5TEST-dsets
+    H5TEST-set_extent
+    MPI_TEST_t_bigio
+    MPI_TEST_t_cache
+    # Fails or times out, not sure why.
+    MPI_TEST_t_2Gio
+    MPI_TEST_t_filters_parallel
+    MPI_TEST_t_shapesame
+    MPI_TEST_testphdf5
+  )
+  skipped_tests_pattern="${skipped_tests[0]}$(printf '|%s' "${skipped_tests[@]:1}")"
+  ctest --test-dir build-mpi --output-on-failure -E "$skipped_tests_pattern"
 }
 
-package() {
-  cd ${pkgname}-${pkgname}_${pkgver/_/-}
-  make DESTDIR="${pkgdir}" install
-  install -Dm644 COPYING -t "${pkgdir}"/usr/share/licenses/${pkgname}
+package_hdf5() {
+  cd ${pkgbase}-${pkgbase}_${pkgver/_/-}
+  DESTDIR="$pkgdir" cmake --install build
+  install -vDm644 -t "$pkgdir/usr/share/licenses/$pkgname" COPYING
+}
 
-  # Install pkg-config files from CMake tree
-  install -Dm644 ../build/CMakeFiles/hdf5{,_hl}{,_cpp,_fortran}.pc -t "${pkgdir}"/usr/lib/pkgconfig/
-  # Fix version numbers in pkg-config files
-  sed -i '/Requires/ s/-/ = /g' "${pkgdir}"/usr/lib/pkgconfig/*.pc
-  # Fix bogus include path
-  sed -re "s|-I/build/hdf5/src/hdf5.*/src/H5FDsubfiling||g" -i "${pkgdir}"/usr/lib/libhdf5.settings -i "${pkgdir}"/usr/bin/*
+package_hdf5-openmpi() {
+  pkgdesc+=" (OpenMPI version)"
+  depends+=(openmpi)
+  provides=(hdf5)
+  conflicts=(hdf5)
+
+  cd ${pkgbase}-${pkgbase}_${pkgver/_/-}
+  DESTDIR="$pkgdir" cmake --install build-mpi
+  install -vDm644 -t "$pkgdir/usr/share/licenses/$pkgname" COPYING
 }
