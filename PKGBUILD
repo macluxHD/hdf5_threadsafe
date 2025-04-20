@@ -11,7 +11,7 @@ pkgname=(
   hdf5-openmpi
 )
 pkgver=1.14.6
-pkgrel=2
+pkgrel=3
 pkgdesc="General purpose library and file format for storing scientific data"
 arch=(x86_64)
 url="https://www.hdfgroup.org/hdf5"
@@ -37,7 +37,7 @@ source=(
   "$pkgbase-make-reproducible.patch"
 )
 sha256sums=('09ee1c671a87401a5201c06106650f62badeea5a3b3941e9b1e2e1e08317357f'
-            'a1b7f92cb38c2e2a7838f0f2fee2ecc4fa1729babe55a7aa1ffef18cff57bede')
+            '37eb26bd2fab59299401c5702b8f0ad23a57e6368a257c426f7ef5ed0ef5c9ca')
 
 prepare() {
   cd ${pkgbase}-${pkgbase}_${pkgver/_/-}
