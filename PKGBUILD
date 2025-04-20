@@ -11,7 +11,7 @@ pkgname=(
   hdf5-openmpi
 )
 pkgver=1.14.6
-pkgrel=1
+pkgrel=2
 pkgdesc="General purpose library and file format for storing scientific data"
 arch=(x86_64)
 url="https://www.hdfgroup.org/hdf5"
@@ -32,8 +32,19 @@ makedepends=(
 )
 replaces=(hdf5-java)
 provides=(hdf5-java)
-source=("https://github.com/HDFGroup/hdf5/archive/hdf5_$pkgver/$pkgname-$pkgver.tar.gz")
-sha256sums=('09ee1c671a87401a5201c06106650f62badeea5a3b3941e9b1e2e1e08317357f')
+source=(
+  "https://github.com/HDFGroup/hdf5/archive/hdf5_$pkgver/$pkgname-$pkgver.tar.gz"
+  "$pkgbase-make-reproducible.patch"
+)
+sha256sums=('09ee1c671a87401a5201c06106650f62badeea5a3b3941e9b1e2e1e08317357f'
+            'a1b7f92cb38c2e2a7838f0f2fee2ecc4fa1729babe55a7aa1ffef18cff57bede')
+
+prepare() {
+  cd ${pkgbase}-${pkgbase}_${pkgver/_/-}
+  # Avoid injecting "Host system" into the libhdf5.settings, results in
+  # differences when building on a host with different kernel version.
+  patch -p1 < ../$pkgbase-make-reproducible.patch
+}
 
 build() {
   cd ${pkgbase}-${pkgbase}_${pkgver/_/-}

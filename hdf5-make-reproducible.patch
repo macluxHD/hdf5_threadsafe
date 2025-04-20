@@ -1,0 +1,12 @@
+diff --unified --recursive --text --new-file hdf5-hdf5_1.14.6.orig/src/libhdf5.settings.cmake.in hdf5-hdf5_1.14.6/src/libhdf5.settings.cmake.in
+--- hdf5-hdf5_1.14.6.orig/src/libhdf5.settings.cmake.in	2025-04-20 12:45:42.634611057 +0200
++++ hdf5-hdf5_1.14.6/src/libhdf5.settings.cmake.in	2025-04-20 12:46:27.384759061 +0200
+@@ -6,7 +6,7 @@
+                    HDF5 Version: @HDF5_PACKAGE_VERSION_STRING@
+                   Configured on: @CONFIG_DATE@
+                   Configured by: @CMAKE_GENERATOR@
+-                    Host system: @CMAKE_HOST_SYSTEM@
++                    Host system:
+               Uname information: @CMAKE_SYSTEM_NAME@
+                        Byte sex: @BYTESEX@
+              Installation point: @CMAKE_INSTALL_PREFIX@
