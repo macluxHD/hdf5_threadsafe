@@ -61,7 +61,6 @@ build() {
     -DHDF5_ENABLE_Z_LIB_SUPPORT=ON
     -DHDF5_ENABLE_SZIP_SUPPORT=ON
     -DHDF5_ENABLE_SZIP_ENCODING=ON
-    -Dlibaec_ROOT=/usr/lib/cmake
     -DHDF5_INSTALL_CMAKE_DIR=lib/cmake/hdf5
   )
   cmake -S . -B build "${common_cmake_args[@]}"
