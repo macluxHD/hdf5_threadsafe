@@ -11,7 +11,7 @@ pkgname=(
   hdf5-openmpi
 )
 pkgver=1.14.6
-pkgrel=3
+pkgrel=4
 pkgdesc="General purpose library and file format for storing scientific data"
 arch=(x86_64)
 url="https://www.hdfgroup.org/hdf5"
@@ -62,6 +62,7 @@ build() {
     -DHDF5_ENABLE_SZIP_SUPPORT=ON
     -DHDF5_ENABLE_SZIP_ENCODING=ON
     -Dlibaec_ROOT=/usr/lib/cmake
+    -DHDF5_INSTALL_CMAKE_DIR=lib/cmake/hdf5
   )
   cmake -S . -B build "${common_cmake_args[@]}"
   cmake -S . -B build-mpi "${common_cmake_args[@]}" \
