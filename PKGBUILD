@@ -62,6 +62,8 @@ build() {
     -DHDF5_ENABLE_SZIP_SUPPORT=ON
     -DHDF5_ENABLE_SZIP_ENCODING=ON
     -DHDF5_INSTALL_CMAKE_DIR=lib/cmake/hdf5
+    -DHDF5_ENABLE_THREADSAFE=ON
+    -DALLOW_UNSUPPORTED=ON
   )
   cmake -S . -B build "${common_cmake_args[@]}"
   cmake -S . -B build-mpi "${common_cmake_args[@]}" \
